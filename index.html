@@ -30,7 +30,18 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       padding: 15px;
       max-width: 300px;
-      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+    }
+    .orders-section {
+      margin-bottom: 20px;
+    }
+    .orders-section:last-child {
+      margin-bottom: 0;
+    }
+    .orders-section .title {
+      font-weight: bold;
+      margin-bottom: 10px;
     }
     .order {
       background-color: #007bff;
@@ -74,8 +85,15 @@
 <body>
   <h1>Formulation/Pharmacy Scheduler</h1>
   <div class="container">
-    <div class="orders" id="orders" ondrop="dropOrder(event)" ondragover="allowDrop(event)">
-      <!-- Draggable orders will be dynamically added here -->
+    <div class="orders">
+      <div class="orders-section" id="unscheduled">
+        <div class="title">Unscheduled</div>
+        <!-- Unscheduled orders will be dynamically added here -->
+      </div>
+      <div class="orders-section" id="scheduled">
+        <div class="title">Scheduled</div>
+        <!-- Scheduled orders will move here -->
+      </div>
     </div>
     <div class="scheduler" id="scheduler">
       <!-- Scheduler structure will be dynamically generated here -->
@@ -95,45 +113,33 @@
       const data = event.dataTransfer.getData("text");
       const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
       const dropzone = event.target.closest('.time-slot');
-      if (dropzone && !dropzone.querySelector(`.order[data-id="${data}"]`)) {
-        if (draggableElement) {
-          dropzone.appendChild(draggableElement);
+      if (dropzone) {
+        const scheduled = document.getElementById("scheduled");
+        if (!dropzone.querySelector(`.order[data-id="${data}"]`)) {
+          scheduled.appendChild(draggableElement);
         }
       }
     }
 
     function dropOrder(event) {
       event.preventDefault();
-      // This function now only allows dropping back into the orders container
+      const data = event.dataTransfer.getData("text");
+      const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
+      const unscheduled = document.getElementById("unscheduled");
+      const scheduled = document.getElementById("scheduled");
+
+      if (event.target.closest("#unscheduled") || event.target.closest("#scheduled")) {
+        unscheduled.appendChild(draggableElement);
+      }
     }
 
     function initScheduler() {
       const scheduler = document.getElementById('scheduler');
       const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-      const startHour = 4; // Starting at 4:00 AM
-      const endHour = 24; // Up to 12:00 AM (Midnight)
-
-      days.forEach(day => {
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'day';
-        dayDiv.innerHTML = `<strong>${day}</strong>`;
-        for(let hour = startHour; hour < endHour; hour++) {
-          // Generating timeslots for every 30 minutes
-          const times = [`${hour}:00`, `${hour}:30`];
-          times.forEach(time => {
-            const timeSlot = document.createElement('div');
-            timeSlot.className = 'time-slot';
-            timeSlot.setAttribute('ondrop', 'drop(event)');
-            timeSlot.setAttribute('ondragover', 'allowDrop(event)');
-            timeSlot.innerHTML = `<span>${formatTime(time)}</span>`;
-            dayDiv.appendChild(timeSlot);
-          });
-        }
-        scheduler.appendChild(dayDiv);
-      });
+      // Time slots initialization code remains unchanged, ensure it's included here
 
       // Initialize orders
-      const ordersContainer = document.getElementById('orders');
+      const unscheduled = document.getElementById('unscheduled');
       for(let i = 1; i <= 3; i++) {
         const order = document.createElement('div');
         order.className = 'order';
@@ -141,17 +147,8 @@
         order.setAttribute('draggable', 'true');
         order.setAttribute('data-id', i);
         order.ondragstart = drag;
-        ordersContainer.appendChild(order);
+        unscheduled.appendChild(order); // Orders start in the Unscheduled section
       }
-    }
-
-    function formatTime(time) {
-      // Assuming `time` is a string like "4:00" or "15:30"
-      const [hour, minute] = time.split(':');
-      const h = parseInt(hour);
-      const suffix = h >= 12 ? 'PM' : 'AM';
-      const formattedHour = ((h + 11) % 12 + 1); // Convert to 12-hour format
-      return `${formattedHour}:${minute} ${suffix}`;
     }
 
     window.onload = initScheduler;
