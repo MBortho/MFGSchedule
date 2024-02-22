@@ -5,137 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drag and Drop Scheduler</title>
   <style>
+    /* CSS adjustments for visual clarity and layout */
     .container {
       display: flex;
       flex-direction: row;
       width: 100%;
     }
-
-    .orders {
-      width: 200px;
+    .orders, .scheduler {
       border: 1px solid #ccc;
+      margin: 10px;
       padding: 10px;
-      margin-right: 20px;
     }
-
     .order {
       background-color: #f0f0f0;
       padding: 5px;
       margin-bottom: 5px;
       cursor: pointer;
     }
-
     .scheduler {
-      display: flex;
-      flex-direction: column;
       flex-grow: 1;
-      width: 0; /* Allow flexbox to take remaining space */
+      display: grid;
+      grid-template-columns: repeat(5, 1fr); /* Adjust based on the number of days */
+      gap: 10px;
     }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
-    .day-header {
-      flex-grow: 1;
-      text-align: center;
-      background-color: #f0f0f0;
-      padding: 10px;
+    .day {
       border: 1px solid #ccc;
+      margin-top: 20px;
     }
-
     .time-slot {
-      border-top: 1px solid #ccc;
-      padding: 5px;
+      border: 1px solid #ccc;
+      padding: 10px;
       height: 60px;
-      position: relative;
+      margin: 2px 0;
+      background-color: #fff;
     }
-
-    .time-label {
-      text-align: right;
-      padding-right: 10px;
-      width: 70px;
-      font-size: 12px;
-    }
-
-    .drop-area {
-      border-bottom: 1px solid #ccc;
-      min-height: 60px;
-      margin: 0 5px;
-      position: relative;
-    }
-
-    .drop-area.drag-over {
+    .time-slot:hover {
       background-color: #f0f8ff;
-    }
-
-    .time-label-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 70px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .time-label-container .time-label {
-      transform: translateY(50%);
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="orders" id="orders" ondrop="dropOrder(event)" ondragover="allowDrop(event)">
+    <div class="orders" id="orders">
+      <!-- Draggable orders -->
       <div class="order" draggable="true" data-id="1" ondragstart="drag(event)">Order 1</div>
       <div class="order" draggable="true" data-id="2" ondragstart="drag(event)">Order 2</div>
       <div class="order" draggable="true" data-id="3" ondragstart="drag(event)">Order 3</div>
-      <!-- Add more orders here -->
     </div>
     <div class="scheduler" id="scheduler">
-      <div class="header">
-        <div class="time-label-container">
-          <div class="time-label">4:00 AM</div>
-          <div class="time-label">5:00 AM</div>
-          <div class="time-label">6:00 AM</div>
-          <div class="time-label">7:00 AM</div>
-          <div class="time-label">8:00 AM</div>
-          <div class="time-label">9:00 AM</div>
-          <div class="time-label">10:00 AM</div>
-          <div class="time-label">11:00 AM</div>
-          <div class="time-label">12:00 PM</div>
-          <div class="time-label">1:00 PM</div>
-          <div class="time-label">2:00 PM</div>
-          <div class="time-label">3:00 PM</div>
-          <div class="time-label">4:00 PM</div>
-          <div class="time-label">5:00 PM</div>
-          <div class="time-label">6:00 PM</div>
-          <div class="time-label">7:00 PM</div>
-          <div class="time-label">8:00 PM</div>
-          <div class="time-label">9:00 PM</div>
-          <div class="time-label">10:00 PM</div>
-          <div class="time-label">11:00 PM</div>
-          <div class="time-label">12:00 AM</div>
-        </div>
-        <div class="day-header">Monday</div>
-        <div class="day-header">Tuesday</div>
-        <div class="day-header">Wednesday</div>
-        <div class="day-header">Thursday</div>
-        <div class="day-header">Friday</div>
-      </div>
-      <div class="time-slot"></div>
-      <div class="scheduler-row">
-        <div class="time-slot drop-area" data-day="monday" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-        <div class="time-slot drop-area" data-day="tuesday" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-        <div class="time-slot drop-area" data-day="wednesday" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-        <div class="time-slot drop-area" data-day="thursday" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-        <div class="time-slot drop-area" data-day="friday" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-      </div>
-      <!-- Add more rows as needed -->
+      <!-- Scheduler structure -->
+      <!-- JavaScript will populate this area -->
     </div>
   </div>
   <script>
@@ -147,30 +66,40 @@
       event.dataTransfer.setData("text", event.target.dataset.id);
     }
 
-    function dropOrder(event) {
-      event.preventDefault();
-      const data = event.dataTransfer.getData("text");
-      const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
-      if (draggableElement) {
-        const orders = document.getElementById("orders");
-        orders.appendChild(draggableElement);
-      }
-    }
-
     function drop(event) {
       event.preventDefault();
       const data = event.dataTransfer.getData("text");
       const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
-      const dropzone = event.target.closest('.drop-area');
+      const dropzone = event.target.closest('.time-slot');
       if (draggableElement && dropzone) {
-        const clonedOrder = draggableElement.cloneNode(true);
-        const timeSlot = document.createElement('div');
-        timeSlot.classList.add('order');
-        timeSlot.appendChild(clonedOrder);
-        dropzone.appendChild(timeSlot);
-        draggableElement.removeAttribute("draggable");
+        dropzone.appendChild(draggableElement.cloneNode(true));
+        // Optionally, remove the original or handle it differently
       }
     }
+
+    // Initialize scheduler with time slots
+    function initScheduler() {
+      const scheduler = document.getElementById('scheduler');
+      const hours = ["4:00 AM", "5:00 AM", "6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM", "12:00 AM"];
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]; // Extend this array for more days
+
+      days.forEach(day => {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'day';
+        dayDiv.innerHTML = `<strong>${day}</strong>`;
+        hours.forEach(hour => {
+          const timeSlot = document.createElement('div');
+          timeSlot.className = 'time-slot';
+          timeSlot.setAttribute('ondrop', 'drop(event)');
+          timeSlot.setAttribute('ondragover', 'allowDrop(event)');
+          timeSlot.textContent = hour;
+          dayDiv.appendChild(timeSlot);
+        });
+        scheduler.appendChild(dayDiv);
+      });
+    }
+
+    window.onload = initScheduler;
   </script>
 </body>
 </html>
