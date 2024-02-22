@@ -39,6 +39,7 @@
       margin-bottom: 10px;
       border-radius: 4px;
       cursor: grab;
+      user-select: none;
     }
     .scheduler {
       flex: 3;
@@ -71,14 +72,10 @@
   <h1>Formulation/Pharmacy Scheduler</h1>
   <div class="container">
     <div class="orders" id="orders" ondrop="dropOrder(event)" ondragover="allowDrop(event)">
-      <!-- Draggable orders -->
-      <div class="order" draggable="true" data-id="1" ondragstart="drag(event)">Order 1</div>
-      <div class="order" draggable="true" data-id="2" ondragstart="drag(event)">Order 2</div>
-      <div class="order" draggable="true" data-id="3" ondragstart="drag(event)">Order 3</div>
+      <!-- Draggable orders will be dynamically added here -->
     </div>
     <div class="scheduler" id="scheduler">
-      <!-- Scheduler structure -->
-      <!-- JavaScript will populate this area -->
+      <!-- Scheduler structure will be dynamically generated here -->
     </div>
   </div>
   <script>
@@ -87,29 +84,29 @@
     }
 
     function drag(event) {
-      event.dataTransfer.setData("text/plain", event.target.id);
-      event.target.classList.add('dragging');
+      event.dataTransfer.setData("text", event.target.dataset.id);
     }
 
     function drop(event) {
       event.preventDefault();
-      const orderId = event.dataTransfer.getData("text/plain");
-      const draggableElement = document.getElementById(orderId);
+      const data = event.dataTransfer.getData("text");
+      const draggableElement = document.querySelector(`.order[data-id="${data}"]`).cloneNode(true);
       const dropzone = event.target.closest('.time-slot');
       if (draggableElement && dropzone) {
         dropzone.appendChild(draggableElement);
-        draggableElement.classList.remove('dragging');
+        // Set the draggable attribute to true again for the cloned element
+        draggableElement.setAttribute("draggable", "true");
+        draggableElement.ondragstart = drag;
       }
     }
 
     function dropOrder(event) {
       event.preventDefault();
-      const orderId = event.dataTransfer.getData("text/plain");
-      const draggableElement = document.getElementById(orderId);
-      const ordersContainer = event.target.closest('.orders');
-      if (draggableElement && ordersContainer) {
+      const data = event.dataTransfer.getData("text");
+      const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
+      const ordersContainer = document.getElementById("orders");
+      if (draggableElement) {
         ordersContainer.appendChild(draggableElement);
-        draggableElement.classList.remove('dragging');
       }
     }
 
@@ -117,7 +114,7 @@
       const scheduler = document.getElementById('scheduler');
       const hours = ["4:00 AM", "5:00 AM", "6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM", "12:00 AM"];
       const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-
+      
       days.forEach(day => {
         const dayDiv = document.createElement('div');
         dayDiv.className = 'day';
@@ -132,9 +129,17 @@
         scheduler.appendChild(dayDiv);
       });
 
-      document.querySelectorAll('.order').forEach(order => {
-        order.setAttribute('id', `order-${order.dataset.id}`);
-      });
+      // Initialize orders
+      const ordersContainer = document.getElementById('orders');
+      for(let i = 1; i <= 3; i++) {
+        const order = document.createElement('div');
+        order.className = 'order';
+        order.textContent = `Order ${i}`;
+        order.setAttribute('draggable', 'true');
+        order.setAttribute('data-id', i);
+        order.ondragstart = drag;
+        ordersContainer.appendChild(order);
+      }
     }
 
     window.onload = initScheduler;
