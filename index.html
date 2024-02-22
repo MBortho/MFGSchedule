@@ -129,11 +129,11 @@
       </div>
       <div class="time-slot"></div>
       <div class="scheduler-row">
-        <div class="time-slot drop-area" data-day="monday"></div>
-        <div class="time-slot drop-area" data-day="tuesday"></div>
-        <div class="time-slot drop-area" data-day="wednesday"></div>
-        <div class="time-slot drop-area" data-day="thursday"></div>
-        <div class="time-slot drop-area" data-day="friday"></div>
+        <div class="time-slot drop-area" data-day="monday" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        <div class="time-slot drop-area" data-day="tuesday" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        <div class="time-slot drop-area" data-day="wednesday" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        <div class="time-slot drop-area" data-day="thursday" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        <div class="time-slot drop-area" data-day="friday" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
       </div>
       <!-- Add more rows as needed -->
     </div>
@@ -163,7 +163,11 @@
       const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
       const dropzone = event.target.closest('.drop-area');
       if (draggableElement && dropzone) {
-        dropzone.appendChild(draggableElement.cloneNode(true));
+        const clonedOrder = draggableElement.cloneNode(true);
+        const timeSlot = document.createElement('div');
+        timeSlot.classList.add('order');
+        timeSlot.appendChild(clonedOrder);
+        dropzone.appendChild(timeSlot);
         draggableElement.removeAttribute("draggable");
       }
     }
