@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drag and Drop Scheduler</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="orders">
+      <div class="order" draggable="true" data-id="1">Order 1</div>
+      <div class="order" draggable="true" data-id="2">Order 2</div>
+      <div class="order" draggable="true" data-id="3">Order 3</div>
+      <!-- Add more orders here -->
+    </div>
+    <div class="scheduler" id="scheduler" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <div class="drop-area" data-day="monday"></div>
+      <div class="drop-area" data-day="tuesday"></div>
+      <div class="drop-area" data-day="wednesday"></div>
+      <div class="drop-area" data-day="thursday"></div>
+      <div class="drop-area" data-day="friday"></div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
