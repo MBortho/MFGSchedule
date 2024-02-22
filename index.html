@@ -59,9 +59,12 @@
     .time-slot {
       background-color: #e9ecef;
       border-radius: 4px;
-      padding: 10px;
+      padding: 5px 10px;
       margin: 2px 0;
       transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     .time-slot:hover, .orders:hover {
       background-color: #dee2e6;
@@ -114,16 +117,17 @@
       const scheduler = document.getElementById('scheduler');
       const hours = ["4:00 AM", "5:00 AM", "6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM", "12:00 AM"];
       const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-      
-      days.forEach(day => {
+
+      days.forEach((day, dayIndex) => {
         const dayDiv = document.createElement('div');
         dayDiv.className = 'day';
         dayDiv.innerHTML = `<strong>${day}</strong>`;
-        hours.forEach(hour => {
+        hours.forEach((hour, hourIndex) => {
           const timeSlot = document.createElement('div');
           timeSlot.className = 'time-slot';
           timeSlot.setAttribute('ondrop', 'drop(event)');
           timeSlot.setAttribute('ondragover', 'allowDrop(event)');
+          timeSlot.innerHTML = `<span>${hour}</span><div class="orders-drop" data-time="${hour}" data-day="${day}"></div>`;
           dayDiv.appendChild(timeSlot);
         });
         scheduler.appendChild(dayDiv);
@@ -136,7 +140,7 @@
         order.className = 'order';
         order.textContent = `Order ${i}`;
         order.setAttribute('draggable', 'true');
-        order.setAttribute('data-id', i);
+        order.setAttribute('data-id', `${i}`);
         order.ondragstart = drag;
         ordersContainer.appendChild(order);
       }
