@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+}
+
+.orders {
+  width: 200px;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.order {
+  background-color: #f0f0f0;
+  padding: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.scheduler {
+  flex-grow: 1;
+  display: flex;
+}
+
+.drop-area {
+  flex-grow: 1;
+  border: 1px solid #ccc;
+  min-height: 100px;
+  margin: 0 5px;
+}
+
+.drop-area.drag-over {
+  background-color: #f0f8ff;
+}
