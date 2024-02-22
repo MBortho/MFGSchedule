@@ -5,42 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drag and Drop Scheduler</title>
   <style>
-    /* CSS adjustments for visual clarity and layout */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+    }
     .container {
       display: flex;
       flex-direction: row;
-      width: 100%;
+      max-width: 100%;
+      gap: 20px;
+      padding: 20px;
     }
-    .orders, .scheduler {
-      border: 1px solid #ccc;
-      margin: 10px;
-      padding: 10px;
+    .orders {
+      flex: 1;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 15px;
+      max-width: 300px;
     }
     .order {
-      background-color: #f0f0f0;
-      padding: 5px;
-      margin-bottom: 5px;
-      cursor: pointer;
+      background-color: #007bff;
+      color: #ffffff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      cursor: grab;
     }
     .scheduler {
-      flex-grow: 1;
+      flex: 3;
       display: grid;
-      grid-template-columns: repeat(5, 1fr); /* Adjust based on the number of days */
+      grid-template-columns: repeat(5, 1fr);
       gap: 10px;
     }
     .day {
-      border: 1px solid #ccc;
-      margin-top: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
     }
     .time-slot {
-      border: 1px solid #ccc;
+      background-color: #e9ecef;
+      border-radius: 4px;
       padding: 10px;
-      height: 60px;
-      margin: 2px 0;
-      background-color: #fff;
+      height: 50px;
+      transition: background-color 0.3s;
     }
     .time-slot:hover {
-      background-color: #f0f8ff;
+      background-color: #dee2e6;
     }
   </style>
 </head>
@@ -73,15 +89,14 @@
       const dropzone = event.target.closest('.time-slot');
       if (draggableElement && dropzone) {
         dropzone.appendChild(draggableElement.cloneNode(true));
-        // Optionally, remove the original or handle it differently
+        draggableElement.remove(); // Removes the order from the left box
       }
     }
 
-    // Initialize scheduler with time slots
     function initScheduler() {
       const scheduler = document.getElementById('scheduler');
       const hours = ["4:00 AM", "5:00 AM", "6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM", "12:00 AM"];
-      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]; // Extend this array for more days
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
       days.forEach(day => {
         const dayDiv = document.createElement('div');
