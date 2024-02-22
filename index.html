@@ -100,77 +100,88 @@
     </div>
   </div>
   <script>
-    function allowDrop(event) {
-      event.preventDefault();
-    }
+  function allowDrop(event) {
+    event.preventDefault();
+  }
 
-    function drag(event) {
-      event.dataTransfer.setData("text", event.target.dataset.id);
-    }
+  function drag(event) {
+    event.dataTransfer.setData("text", event.target.dataset.id);
+  }
 
-    function drop(event) {
-      event.preventDefault();
-      const data = event.dataTransfer.getData("text");
-      const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
-      const dropzone = event.target.closest('.time-slot');
-      if (dropzone) {
+  function drop(event) {
+    event.preventDefault();
+    const data = event.dataTransfer.getData("text");
+    const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
+    const dropzone = event.target.closest('.time-slot');
+    if (dropzone) {
+      // This checks if the order is already scheduled. If not, it schedules it.
+      if (!draggableElement.classList.contains('scheduled')) {
+        dropzone.appendChild(draggableElement.cloneNode(true)); // Clone and append to the time slot
+        draggableElement.classList.add('scheduled'); // Mark as scheduled
+        
+        // Move the original order to the "Scheduled" section without removing it from "Unscheduled"
         const scheduledSection = document.getElementById("scheduled");
-        if (!dropzone.querySelector(`.order[data-id="${data}"]`)) {
-          dropzone.appendChild(draggableElement);
-          scheduledSection.appendChild(draggableElement); // Move to scheduled on drop in time slot
+        if (!scheduledSection.querySelector(`.order[data-id="${data}"]`)) {
+          scheduledSection.appendChild(draggableElement);
         }
       }
     }
+  }
 
-    function dropOrder(event) {
-      event.preventDefault();
-      const data = event.dataTransfer.getData("text");
-      const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
+  function dropOrder(event) {
+    event.preventDefault();
+    const data = event.dataTransfer.getData("text");
+    const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
+    const target = event.target.closest('.orders-section');
+
+    // Move back to unscheduled if dropped in the "Unscheduled" section
+    if (target && target.id === "unscheduled") {
       const unscheduledSection = document.getElementById("unscheduled");
-
-      if (event.target.closest("#unscheduled")) {
-        unscheduledSection.appendChild(draggableElement); // Move back to unscheduled if dropped back
-      }
+      draggableElement.classList.remove('scheduled'); // Remove scheduled status
+      unscheduledSection.appendChild(draggableElement); // Move back to unscheduled
     }
+  }
 
-    function initScheduler() {
-      const scheduler = document.getElementById('scheduler');
-      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-      const startHour = 4; // Starting at 4:00 AM
-      let hour = startHour;
+  function initScheduler() {
+    const scheduler = document.getElementById('scheduler');
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const startHour = 4; // Starting at 4:00 AM
+    const endHour = 24; // Up to 12:00 AM (Midnight)
+    const minutes = ['00', '30']; // For half-hour increments
 
-      for (let day of days) {
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'day';
-        dayDiv.innerHTML = `<strong>${day}</strong>`;
-        for (hour = startHour; hour < 24; hour++) {
-          ['00', '30'].forEach(minute => {
-            const time = `${hour}:${minute}`;
-            const timeSlot = document.createElement('div');
-            timeSlot.className = 'time-slot';
-            timeSlot.setAttribute('ondrop', 'drop(event)');
-            timeSlot.setAttribute('ondragover', 'allowDrop(event)');
-            timeSlot.innerHTML = time.length === 4 ? `0${time}` : time; // Pad hour if needed
-            dayDiv.appendChild(timeSlot);
-          });
-        }
-        scheduler.appendChild(dayDiv);
+    days.forEach(day => {
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'day';
+      dayDiv.innerHTML = `<strong>${day}</strong>`;
+      for(let hour = startHour; hour < endHour; hour++) {
+        minutes.forEach(minute => {
+          const time = `${hour % 24}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+          const timeSlot = document.createElement('div');
+          timeSlot.className = 'time-slot';
+          timeSlot.setAttribute('ondrop', 'drop(event)');
+          timeSlot.setAttribute('ondragover', 'allowDrop(event)');
+          timeSlot.innerHTML = time;
+          dayDiv.appendChild(timeSlot);
+        });
       }
+      scheduler.appendChild(dayDiv);
+    });
 
-      // Initialize orders in "Unscheduled"
-      const unscheduled = document.getElementById('unscheduled');
-      for(let i = 1; i <= 3; i++) {
-        const order = document.createElement('div');
-        order.className = 'order';
-        order.textContent = `Order ${i}`;
-        order.setAttribute('draggable', 'true');
-        order.setAttribute('data-id', i);
-        order.ondragstart = drag;
-        unscheduled.appendChild(order);
-      }
+    // Initialize orders in the "Unscheduled" section
+    const unscheduledSection = document.getElementById('unscheduled');
+    for(let i = 1; i <= 3; i++) {
+      const order = document.createElement('div');
+      order.className = 'order';
+      order.textContent = `Order ${i}`;
+      order.setAttribute('draggable', 'true');
+      order.setAttribute('data-id', i);
+      order.ondragstart = drag;
+      unscheduledSection.appendChild(order);
     }
+  }
 
-    window.onload = initScheduler;
-  </script>
+  window.onload = initScheduler;
+</script>
+
 </body>
 </html>
