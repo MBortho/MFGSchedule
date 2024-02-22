@@ -51,6 +51,7 @@
       border-top: 1px solid #ccc;
       padding: 5px;
       height: 60px;
+      position: relative;
     }
 
     .time-label {
@@ -89,42 +90,42 @@
 </head>
 <body>
   <div class="container">
-    <div class="orders">
+    <div class="orders" id="orders" ondrop="dropOrder(event)" ondragover="allowDrop(event)">
       <div class="order" draggable="true" data-id="1" ondragstart="drag(event)">Order 1</div>
       <div class="order" draggable="true" data-id="2" ondragstart="drag(event)">Order 2</div>
       <div class="order" draggable="true" data-id="3" ondragstart="drag(event)">Order 3</div>
       <!-- Add more orders here -->
     </div>
-    <div class="scheduler" id="scheduler" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <div class="scheduler" id="scheduler">
       <div class="header">
+        <div class="time-label-container">
+          <div class="time-label">4:00 AM</div>
+          <div class="time-label">5:00 AM</div>
+          <div class="time-label">6:00 AM</div>
+          <div class="time-label">7:00 AM</div>
+          <div class="time-label">8:00 AM</div>
+          <div class="time-label">9:00 AM</div>
+          <div class="time-label">10:00 AM</div>
+          <div class="time-label">11:00 AM</div>
+          <div class="time-label">12:00 PM</div>
+          <div class="time-label">1:00 PM</div>
+          <div class="time-label">2:00 PM</div>
+          <div class="time-label">3:00 PM</div>
+          <div class="time-label">4:00 PM</div>
+          <div class="time-label">5:00 PM</div>
+          <div class="time-label">6:00 PM</div>
+          <div class="time-label">7:00 PM</div>
+          <div class="time-label">8:00 PM</div>
+          <div class="time-label">9:00 PM</div>
+          <div class="time-label">10:00 PM</div>
+          <div class="time-label">11:00 PM</div>
+          <div class="time-label">12:00 AM</div>
+        </div>
         <div class="day-header">Monday</div>
         <div class="day-header">Tuesday</div>
         <div class="day-header">Wednesday</div>
         <div class="day-header">Thursday</div>
         <div class="day-header">Friday</div>
-      </div>
-      <div class="time-label-container">
-        <div class="time-label">4:00 AM</div>
-        <div class="time-label">5:00 AM</div>
-        <div class="time-label">6:00 AM</div>
-        <div class="time-label">7:00 AM</div>
-        <div class="time-label">8:00 AM</div>
-        <div class="time-label">9:00 AM</div>
-        <div class="time-label">10:00 AM</div>
-        <div class="time-label">11:00 AM</div>
-        <div class="time-label">12:00 PM</div>
-        <div class="time-label">1:00 PM</div>
-        <div class="time-label">2:00 PM</div>
-        <div class="time-label">3:00 PM</div>
-        <div class="time-label">4:00 PM</div>
-        <div class="time-label">5:00 PM</div>
-        <div class="time-label">6:00 PM</div>
-        <div class="time-label">7:00 PM</div>
-        <div class="time-label">8:00 PM</div>
-        <div class="time-label">9:00 PM</div>
-        <div class="time-label">10:00 PM</div>
-        <div class="time-label">11:00 PM</div>
-        <div class="time-label">12:00 AM</div>
       </div>
       <div class="time-slot"></div>
       <div class="scheduler-row">
@@ -146,13 +147,23 @@
       event.dataTransfer.setData("text", event.target.dataset.id);
     }
 
+    function dropOrder(event) {
+      event.preventDefault();
+      const data = event.dataTransfer.getData("text");
+      const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
+      if (draggableElement) {
+        const orders = document.getElementById("orders");
+        orders.appendChild(draggableElement);
+      }
+    }
+
     function drop(event) {
       event.preventDefault();
       const data = event.dataTransfer.getData("text");
       const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
       const dropzone = event.target.closest('.drop-area');
       if (draggableElement && dropzone) {
-        dropzone.appendChild(draggableElement);
+        dropzone.appendChild(draggableElement.cloneNode(true));
         draggableElement.removeAttribute("draggable");
       }
     }
