@@ -50,16 +50,40 @@
     .time-slot {
       border-top: 1px solid #ccc;
       padding: 5px;
+      height: 60px;
+    }
+
+    .time-label {
+      text-align: right;
+      padding-right: 10px;
+      width: 70px;
+      font-size: 12px;
     }
 
     .drop-area {
       border-bottom: 1px solid #ccc;
       min-height: 60px;
       margin: 0 5px;
+      position: relative;
     }
 
     .drop-area.drag-over {
       background-color: #f0f8ff;
+    }
+
+    .time-label-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 70px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .time-label-container .time-label {
+      transform: translateY(50%);
     }
   </style>
 </head>
@@ -69,13 +93,6 @@
       <div class="order" draggable="true" data-id="1" ondragstart="drag(event)">Order 1</div>
       <div class="order" draggable="true" data-id="2" ondragstart="drag(event)">Order 2</div>
       <div class="order" draggable="true" data-id="3" ondragstart="drag(event)">Order 3</div>
-      <div class="order" draggable="true" data-id="4" ondragstart="drag(event)">Order 4</div>
-      <div class="order" draggable="true" data-id="5" ondragstart="drag(event)">Order 5</div>
-      <div class="order" draggable="true" data-id="6" ondragstart="drag(event)">Order 6</div>
-      <div class="order" draggable="true" data-id="7" ondragstart="drag(event)">Order 7</div>
-      <div class="order" draggable="true" data-id="8" ondragstart="drag(event)">Order 8</div>
-      <div class="order" draggable="true" data-id="9" ondragstart="drag(event)">Order 9</div>
-      <div class="order" draggable="true" data-id="10" ondragstart="drag(event)">Order 10</div>
       <!-- Add more orders here -->
     </div>
     <div class="scheduler" id="scheduler" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -85,6 +102,29 @@
         <div class="day-header">Wednesday</div>
         <div class="day-header">Thursday</div>
         <div class="day-header">Friday</div>
+      </div>
+      <div class="time-label-container">
+        <div class="time-label">4:00 AM</div>
+        <div class="time-label">5:00 AM</div>
+        <div class="time-label">6:00 AM</div>
+        <div class="time-label">7:00 AM</div>
+        <div class="time-label">8:00 AM</div>
+        <div class="time-label">9:00 AM</div>
+        <div class="time-label">10:00 AM</div>
+        <div class="time-label">11:00 AM</div>
+        <div class="time-label">12:00 PM</div>
+        <div class="time-label">1:00 PM</div>
+        <div class="time-label">2:00 PM</div>
+        <div class="time-label">3:00 PM</div>
+        <div class="time-label">4:00 PM</div>
+        <div class="time-label">5:00 PM</div>
+        <div class="time-label">6:00 PM</div>
+        <div class="time-label">7:00 PM</div>
+        <div class="time-label">8:00 PM</div>
+        <div class="time-label">9:00 PM</div>
+        <div class="time-label">10:00 PM</div>
+        <div class="time-label">11:00 PM</div>
+        <div class="time-label">12:00 AM</div>
       </div>
       <div class="time-slot"></div>
       <div class="scheduler-row">
