@@ -73,9 +73,8 @@
 </head>
 <body>
   <h1>Formulation/Pharmacy Scheduler</h1>
- <div class="container">
+  <div class="container">
     <div class="orders" id="orders" ondrop="dropOrder(event)" ondragover="allowDrop(event)">
-
       <!-- Draggable orders will be dynamically added here -->
     </div>
     <div class="scheduler" id="scheduler">
@@ -94,43 +93,42 @@
     function drop(event) {
       event.preventDefault();
       const data = event.dataTransfer.getData("text");
-      const draggableElement = document.querySelector(`.order[data-id="${data}"]`).cloneNode(true);
+      const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
       const dropzone = event.target.closest('.time-slot');
-      if (draggableElement && dropzone) {
-        dropzone.appendChild(draggableElement);
-        // Set the draggable attribute to true again for the cloned element
-        draggableElement.setAttribute("draggable", "true");
-        draggableElement.ondragstart = drag;
+      if (dropzone && !dropzone.querySelector(`.order[data-id="${data}"]`)) {
+        if (draggableElement) {
+          dropzone.appendChild(draggableElement);
+        }
       }
     }
 
     function dropOrder(event) {
       event.preventDefault();
-      const data = event.dataTransfer.getData("text");
-      const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
-      const ordersContainer = document.getElementById("orders");
-      if (draggableElement) {
-        ordersContainer.appendChild(draggableElement);
-      }
+      // This function now only allows dropping back into the orders container
     }
 
-   function initScheduler() {
+    function initScheduler() {
       const scheduler = document.getElementById('scheduler');
-      const hours = ["4:00 AM", "5:00 AM", "6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM", "12:00 AM"];
       const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+      const startHour = 4; // Starting at 4:00 AM
+      const endHour = 24; // Up to 12:00 AM (Midnight)
 
-      days.forEach((day, dayIndex) => {
+      days.forEach(day => {
         const dayDiv = document.createElement('div');
         dayDiv.className = 'day';
         dayDiv.innerHTML = `<strong>${day}</strong>`;
-        hours.forEach((hour, hourIndex) => {
-          const timeSlot = document.createElement('div');
-          timeSlot.className = 'time-slot';
-          timeSlot.setAttribute('ondrop', 'drop(event)');
-          timeSlot.setAttribute('ondragover', 'allowDrop(event)');
-          timeSlot.innerHTML = `<span>${hour}</span><div class="orders-drop" data-time="${hour}" data-day="${day}"></div>`;
-          dayDiv.appendChild(timeSlot);
-        });
+        for(let hour = startHour; hour < endHour; hour++) {
+          // Generating timeslots for every 30 minutes
+          const times = [`${hour}:00`, `${hour}:30`];
+          times.forEach(time => {
+            const timeSlot = document.createElement('div');
+            timeSlot.className = 'time-slot';
+            timeSlot.setAttribute('ondrop', 'drop(event)');
+            timeSlot.setAttribute('ondragover', 'allowDrop(event)');
+            timeSlot.innerHTML = `<span>${formatTime(time)}</span>`;
+            dayDiv.appendChild(timeSlot);
+          });
+        }
         scheduler.appendChild(dayDiv);
       });
 
@@ -141,10 +139,19 @@
         order.className = 'order';
         order.textContent = `Order ${i}`;
         order.setAttribute('draggable', 'true');
-        order.setAttribute('data-id', `${i}`);
+        order.setAttribute('data-id', i);
         order.ondragstart = drag;
         ordersContainer.appendChild(order);
       }
+    }
+
+    function formatTime(time) {
+      // Assuming `time` is a string like "4:00" or "15:30"
+      const [hour, minute] = time.split(':');
+      const h = parseInt(hour);
+      const suffix = h >= 12 ? 'PM' : 'AM';
+      const formattedHour = ((h + 11) % 12 + 1); // Convert to 12-hour format
+      return `${formattedHour}:${minute} ${suffix}`;
     }
 
     window.onload = initScheduler;
