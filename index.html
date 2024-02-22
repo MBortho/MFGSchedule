@@ -7,14 +7,35 @@
   <style>
     .container {
       display: flex;
+      flex-direction: row;
+      width: 100%;
+    }
+
+    .orders {
+      width: 200px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-right: 20px;
+    }
+
+    .order {
+      background-color: #f0f0f0;
+      padding: 5px;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+
+    .scheduler {
+      display: flex;
       flex-direction: column;
-      align-items: center;
+      flex-grow: 1;
+      width: 0; /* Allow flexbox to take remaining space */
     }
 
     .header {
       display: flex;
       justify-content: space-between;
-      width: 800px; /* Adjust as needed */
+      width: 100%;
       margin-bottom: 10px;
     }
 
@@ -26,16 +47,9 @@
       border: 1px solid #ccc;
     }
 
-    .scheduler {
-      display: flex;
-      width: 800px; /* Adjust as needed */
-      border-collapse: collapse;
-    }
-
     .time-slot {
       border: 1px solid #ccc;
-      min-width: 120px;
-      height: 60px;
+      min-height: 60px;
       padding: 5px;
     }
 
@@ -53,20 +67,29 @@
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <div class="day-header">Monday</div>
-      <div class="day-header">Tuesday</div>
-      <div class="day-header">Wednesday</div>
-      <div class="day-header">Thursday</div>
-      <div class="day-header">Friday</div>
+    <div class="orders">
+      <div class="order" draggable="true" data-id="1" ondragstart="drag(event)">Order 1</div>
+      <div class="order" draggable="true" data-id="2" ondragstart="drag(event)">Order 2</div>
+      <div class="order" draggable="true" data-id="3" ondragstart="drag(event)">Order 3</div>
+      <!-- Add more orders here -->
     </div>
     <div class="scheduler" id="scheduler" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <div class="header">
+        <div class="day-header">Monday</div>
+        <div class="day-header">Tuesday</div>
+        <div class="day-header">Wednesday</div>
+        <div class="day-header">Thursday</div>
+        <div class="day-header">Friday</div>
+      </div>
       <div class="time-slot"></div>
-      <div class="drop-area" data-day="monday"></div>
-      <div class="drop-area" data-day="tuesday"></div>
-      <div class="drop-area" data-day="wednesday"></div>
-      <div class="drop-area" data-day="thursday"></div>
-      <div class="drop-area" data-day="friday"></div>
+      <div class="scheduler-row">
+        <div class="time-slot drop-area" data-day="monday"></div>
+        <div class="time-slot drop-area" data-day="tuesday"></div>
+        <div class="time-slot drop-area" data-day="wednesday"></div>
+        <div class="time-slot drop-area" data-day="thursday"></div>
+        <div class="time-slot drop-area" data-day="friday"></div>
+      </div>
+      <!-- Add more rows as needed -->
     </div>
   </div>
   <script>
