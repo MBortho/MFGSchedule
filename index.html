@@ -114,9 +114,10 @@
       const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
       const dropzone = event.target.closest('.time-slot');
       if (dropzone) {
-        const scheduled = document.getElementById("scheduled");
+        const scheduledSection = document.getElementById("scheduled");
         if (!dropzone.querySelector(`.order[data-id="${data}"]`)) {
-          scheduled.appendChild(draggableElement);
+          dropzone.appendChild(draggableElement);
+          scheduledSection.appendChild(draggableElement); // Move to scheduled on drop in time slot
         }
       }
     }
@@ -125,20 +126,38 @@
       event.preventDefault();
       const data = event.dataTransfer.getData("text");
       const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
-      const unscheduled = document.getElementById("unscheduled");
-      const scheduled = document.getElementById("scheduled");
+      const unscheduledSection = document.getElementById("unscheduled");
 
-      if (event.target.closest("#unscheduled") || event.target.closest("#scheduled")) {
-        unscheduled.appendChild(draggableElement);
+      if (event.target.closest("#unscheduled")) {
+        unscheduledSection.appendChild(draggableElement); // Move back to unscheduled if dropped back
       }
     }
 
     function initScheduler() {
       const scheduler = document.getElementById('scheduler');
       const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-      // Time slots initialization code remains unchanged, ensure it's included here
+      const startHour = 4; // Starting at 4:00 AM
+      let hour = startHour;
 
-      // Initialize orders
+      for (let day of days) {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'day';
+        dayDiv.innerHTML = `<strong>${day}</strong>`;
+        for (hour = startHour; hour < 24; hour++) {
+          ['00', '30'].forEach(minute => {
+            const time = `${hour}:${minute}`;
+            const timeSlot = document.createElement('div');
+            timeSlot.className = 'time-slot';
+            timeSlot.setAttribute('ondrop', 'drop(event)');
+            timeSlot.setAttribute('ondragover', 'allowDrop(event)');
+            timeSlot.innerHTML = time.length === 4 ? `0${time}` : time; // Pad hour if needed
+            dayDiv.appendChild(timeSlot);
+          });
+        }
+        scheduler.appendChild(dayDiv);
+      }
+
+      // Initialize orders in "Unscheduled"
       const unscheduled = document.getElementById('unscheduled');
       for(let i = 1; i <= 3; i++) {
         const order = document.createElement('div');
@@ -147,7 +166,7 @@
         order.setAttribute('draggable', 'true');
         order.setAttribute('data-id', i);
         order.ondragstart = drag;
-        unscheduled.appendChild(order); // Orders start in the Unscheduled section
+        unscheduled.appendChild(order);
       }
     }
 
