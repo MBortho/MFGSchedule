@@ -4,184 +4,57 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drag and Drop Scheduler - Formulation/Pharmacy</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      color: #007bff;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .container {
-      display: flex;
-      flex-direction: row;
-      max-width: 100%;
-      gap: 20px;
-    }
-    .orders {
-      flex: 1;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      padding: 15px;
-      max-width: 300px;
-      display: flex;
-      flex-direction: column;
-    }
-    .orders-section {
-      margin-bottom: 20px;
-    }
-    .orders-section:last-child {
-      margin-bottom: 0;
-    }
-    .orders-section .title {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    .order {
-      background-color: #007bff;
-      color: #ffffff;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 4px;
-      cursor: grab;
-      user-select: none;
-    }
-    .scheduler {
-      flex: 3;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-    }
-    .day {
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .time-slot {
-      background-color: #e9ecef;
-      border-radius: 4px;
-      padding: 5px 10px;
-      margin: 2px 0;
-      transition: background-color 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .time-slot:hover, .orders:hover {
-      background-color: #dee2e6;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <h1>Formulation/Pharmacy Scheduler</h1>
+  <div>
+    <label for="start-date">Select Starting Monday:</label>
+    <input type="date" id="start-date" min="2024-01-01" max="2024-12-31">
+  </div>
   <div class="container">
     <div class="orders">
       <div class="orders-section" id="unscheduled">
         <div class="title">Unscheduled</div>
-        <!-- Unscheduled orders will be dynamically added here -->
       </div>
-      <div class="orders-section" id="scheduled">
-        <div class="title">Scheduled</div>
-        <!-- Scheduled orders will move here -->
+      <div class="orders-section" id="cleans">
+        <div class="title">Cleans</div>
+        <div class="order clean" draggable="true" data-id="102">Dry Clean</div>
+        <div class="order clean" draggable="true" data-id="103">Wet Clean</div>
       </div>
     </div>
-    <div class="scheduler" id="scheduler">
-      <!-- Scheduler structure will be dynamically generated here -->
-    </div>
+    <div class="scheduler" id="scheduler"></div>
   </div>
-  <script>
-  function allowDrop(event) {
-    event.preventDefault();
-  }
-
-  function drag(event) {
-    event.dataTransfer.setData("text", event.target.dataset.id);
-  }
-
-  function drop(event) {
-    event.preventDefault();
-    const data = event.dataTransfer.getData("text");
-    const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
-    const dropzone = event.target.closest('.time-slot');
-    if (dropzone) {
-      // This checks if the order is already scheduled. If not, it schedules it.
-      if (!draggableElement.classList.contains('scheduled')) {
-        dropzone.appendChild(draggableElement.cloneNode(true)); // Clone and append to the time slot
-        draggableElement.classList.add('scheduled'); // Mark as scheduled
-        
-        // Move the original order to the "Scheduled" section without removing it from "Unscheduled"
-        const scheduledSection = document.getElementById("scheduled");
-        if (!scheduledSection.querySelector(`.order[data-id="${data}"]`)) {
-          scheduledSection.appendChild(draggableElement);
-        }
-      }
-    }
-  }
-
-  function dropOrder(event) {
-    event.preventDefault();
-    const data = event.dataTransfer.getData("text");
-    const draggableElement = document.querySelector(`.order[data-id="${data}"]`);
-    const target = event.target.closest('.orders-section');
-
-    // Move back to unscheduled if dropped in the "Unscheduled" section
-    if (target && target.id === "unscheduled") {
-      const unscheduledSection = document.getElementById("unscheduled");
-      draggableElement.classList.remove('scheduled'); // Remove scheduled status
-      unscheduledSection.appendChild(draggableElement); // Move back to unscheduled
-    }
-  }
-
-  function initScheduler() {
-    const scheduler = document.getElementById('scheduler');
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    const startHour = 4; // Starting at 4:00 AM
-    const endHour = 24; // Up to 12:00 AM (Midnight)
-    const minutes = ['00', '30']; // For half-hour increments
-
-    days.forEach(day => {
-      const dayDiv = document.createElement('div');
-      dayDiv.className = 'day';
-      dayDiv.innerHTML = `<strong>${day}</strong>`;
-      for(let hour = startHour; hour < endHour; hour++) {
-        minutes.forEach(minute => {
-          const time = `${hour % 24}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-          const timeSlot = document.createElement('div');
-          timeSlot.className = 'time-slot';
-          timeSlot.setAttribute('ondrop', 'drop(event)');
-          timeSlot.setAttribute('ondragover', 'allowDrop(event)');
-          timeSlot.innerHTML = time;
-          dayDiv.appendChild(timeSlot);
-        });
-      }
-      scheduler.appendChild(dayDiv);
-    });
-
-    // Initialize orders in the "Unscheduled" section
-    const unscheduledSection = document.getElementById('unscheduled');
-    for(let i = 1; i <= 3; i++) {
-      const order = document.createElement('div');
-      order.className = 'order';
-      order.textContent = `Order ${i}`;
-      order.setAttribute('draggable', 'true');
-      order.setAttribute('data-id', i);
-      order.ondragstart = drag;
-      unscheduledSection.appendChild(order);
-    }
-  }
-
-  window.onload = initScheduler;
-</script>
-
+  <script src="script.js"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drag and Drop Scheduler - Formulation/Pharmacy</title>
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Formulation/Pharmacy Scheduler</h1>
+  <div>
+    <label for="start-date">Select Starting Monday:</label>
+    <input type="date" id="start-date" min="2024-01-01" max="2024-12-31">
+  </div>
+  <div class="container">
+    <div class="orders">
+      <div class="orders-section" id="unscheduled">
+        <div class="title">Unscheduled</div>
+      </div>
+      <div class="orders-section" id="cleans">
+        <div class="title">Cleans</div>
+        <div class="order clean" draggable="true" data-id="102">Dry Clean</div>
+        <div class="order clean" draggable="true" data-id="103">Wet Clean</div>
+      </div>
+    </div>
+    <div class="scheduler" id="scheduler"></div>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
