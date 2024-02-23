@@ -28,33 +28,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drag and Drop Scheduler - Formulation/Pharmacy</title>
-  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <h1>Formulation/Pharmacy Scheduler</h1>
-  <div>
-    <label for="start-date">Select Starting Monday:</label>
-    <input type="date" id="start-date" min="2024-01-01" max="2024-12-31">
-  </div>
-  <div class="container">
-    <div class="orders">
-      <div class="orders-section" id="unscheduled">
-        <div class="title">Unscheduled</div>
-      </div>
-      <div class="orders-section" id="cleans">
-        <div class="title">Cleans</div>
-        <div class="order clean" draggable="true" data-id="102">Dry Clean</div>
-        <div class="order clean" draggable="true" data-id="103">Wet Clean</div>
-      </div>
-    </div>
-    <div class="scheduler" id="scheduler"></div>
-  </div>
-  <script src="script.js"></script>
-</body>
-</html>
